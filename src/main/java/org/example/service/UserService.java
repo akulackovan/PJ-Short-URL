@@ -9,7 +9,7 @@ import org.example.exception.UserExceptions;
 import org.example.model.Notification;
 import org.example.storage.JsonStorage;
 
-/*
+/**
  * Сервис управления списом пользователей и уведомлений
  */
 public class UserService {

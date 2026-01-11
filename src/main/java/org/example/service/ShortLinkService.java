@@ -11,7 +11,7 @@ import org.example.model.ShortLink;
 import org.example.storage.Config;
 import org.example.storage.JsonStorage;
 
-/*
+/**
  * Сервис управления списком ссылок
  */
 public class ShortLinkService {

@@ -1,7 +1,7 @@
 package org.example.model;
+
 /**
  * Перечисление типов уведомления
- *
  */
 public enum NotificationType {
 
