@@ -82,7 +82,7 @@ public class ShortLinkManager {
         NotificationService.checkAndSendLinkNotifications(shortLink);
         if (shortLink.getCountOfRequest() == 0 && user != shortLink.getUuid()) {
             userService.addNotification(shortLink.getUuid(), new Notification(shortLink.getShortLink(),
-                    NotificationType.LINK_EXPIRED));
+                    NotificationType.LIMIT_EXCEEDED));
             userService.addNotification(shortLink.getUuid(), new Notification(shortLink.getShortLink(), NotificationType.LINK_DELETED));
         }
         if (shortLink.getCountOfRequest() == 0) {
