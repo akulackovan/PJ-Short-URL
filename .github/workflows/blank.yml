@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Проверка репозитория
+      - uses: actions/checkout@v4
+
+      # Кэширование зависимостей Maven
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+          
+      # Сборка проекта
+      - name: Build with Maven
+        run: mvn clean install
+
+      # Запуск тестов
+      - name: Run tests
+        run: mvn test
