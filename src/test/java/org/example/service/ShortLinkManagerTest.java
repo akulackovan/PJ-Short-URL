@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.example.exception.LinkExceptions;
 import org.example.exception.UserExceptions;
 import org.example.model.ShortLink;
+import org.junit.jupiter.api.AfterAll;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -18,33 +19,51 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.MockedStatic;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
+import org.mockito.Mockito;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ShortLinkManagerTest {
 
     private static final String TEST_FILE = "data/test.json";
+    private static final Object LOCK = new Object();
+    private static MockedStatic<Desktop> mockedDesktop;
     private ShortLinkManager manager;
-    private Desktop mockDesktop;
+    private Desktop desktopMock;
 
+    @BeforeAll
+    void initAll() {
+        synchronized (LOCK) {
+            if (mockedDesktop == null) {
+                mockedDesktop = Mockito.mockStatic(Desktop.class);
+            }
+        }
+    }
+
+    @AfterAll
+    void tearDownAll() {
+        synchronized (LOCK) {
+            if (mockedDesktop != null) {
+                mockedDesktop.close();
+                mockedDesktop = null;
+            }
+        }
+    }
 
     @BeforeEach
     void setUp() throws IOException {
         cleanupTestFiles();
 
-        mockDesktop = mock(Desktop.class);
-        MockedStatic<Desktop> mockedDesktop = mockStatic(Desktop.class);
-        mockedDesktop.when(Desktop::getDesktop).thenReturn(mockDesktop);
-
+        synchronized (LOCK) {
+            desktopMock = Mockito.mock(Desktop.class);
+            mockedDesktop.when(Desktop::getDesktop).thenReturn(desktopMock);
+        }
 
         manager = new ShortLinkManager(TEST_FILE);
-
     }
 
     private void cleanupTestFiles() {
