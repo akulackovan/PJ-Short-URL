@@ -102,6 +102,7 @@ public class ShortLinkManager {
             throw new LinkExceptions.UnauthorizedAccessException();
         }
         shortLinkService.removeLink(shortLink);
+        NotificationService.notify(NotificationType.LINK_DELETED, link);
     }
 
     public void changeLink(String link, UUID user, Integer countOfRequest, LocalDateTime dateTime)
@@ -116,6 +117,7 @@ public class ShortLinkManager {
             throw new LinkExceptions.UnauthorizedAccessException();
         }
         shortLinkService.changeLink(shortLink, countOfRequest, dateTime);
+        NotificationService.notify(NotificationType.LINK_CHANGED, link);
     }
 
     public ShortLink validateShortLink(String shortLink)

@@ -10,7 +10,8 @@ public enum NotificationType {
     LOW_LIMIT_WARNING("Осталось мало переходов (3 или менее)"),
     DATE_WARNING("Ссылка скоро исчезнет"),
     LINK_CREATED("Ссылка создана"),
-    LINK_DELETED("Ссылка удалена");
+    LINK_DELETED("Ссылка удалена"),
+    LINK_CHANGED("Ссылка изменена");
 
     private final String description;
 

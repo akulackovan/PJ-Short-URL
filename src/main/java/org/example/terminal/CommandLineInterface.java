@@ -238,7 +238,6 @@ public class CommandLineInterface {
             System.out.println(e.getMessage());
             return;
         }
-        System.out.println("Ссылка удалена");
     }
 
     private void changeLink(String[] args) {
@@ -276,7 +275,6 @@ public class CommandLineInterface {
             System.out.println(e.getMessage());
             return;
         }
-        System.out.println("Ссылка изменена");
     }
 
     private void useLink(String[] args) {
