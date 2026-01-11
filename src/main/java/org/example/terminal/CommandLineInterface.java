@@ -114,12 +114,14 @@ public class CommandLineInterface {
         }
         if (params == null)
             return;
-        Integer count = 0;
+        Integer count = null;
         try {
-            count = Integer.parseInt(params.get("-c"));
-            if (count != null && count <= 0) {
-                System.out.println("Значение количества обращений не может быть меньше или равно 0");
-                return;
+            if (params.getOrDefault("-c", null) != null) {
+                count = Integer.parseInt(params.get("-c"));
+                if (count != null && count <= 0) {
+                    System.out.println("Значение количества обращений не может быть меньше или равно 0");
+                    return;
+                }
             }
         } catch (NumberFormatException e) {
             System.out.println(
@@ -247,22 +249,24 @@ public class CommandLineInterface {
         }
         Map<String, String> params;
         ShortLink shortLink;
-        Integer count;
         try {
             params = commandParser.parseCommand(args, commands.getCommands().get(CommandsName.CHANGE_COMMAND.getCommand()));
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return;
         }
+        Integer count = null;
         try {
-            count = Integer.parseInt(params.get("-c"));
-            if (count != null && count <= 0) {
-                System.out.println("Значение количества обращений не может быть меньше или равно 0");
-                return;
+            if (params.getOrDefault("-c", null) != null) {
+                count = Integer.parseInt(params.get("-c"));
+                if (count != null && count <= 0) {
+                    System.out.println("Значение количества обращений не может быть меньше или равно 0");
+                    return;
+                }
             }
         } catch (NumberFormatException e) {
             System.out.println(
-                    "Количество обращений к короткой ссылке не является числом.\nКороткая ссылка не будет создана");
+                    "Количество обращений к короткой ссылке не является числом");
             return;
         }
         try {
