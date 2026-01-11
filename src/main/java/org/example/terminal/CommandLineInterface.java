@@ -266,7 +266,7 @@ public class CommandLineInterface {
             return;
         }
         try {
-            LocalDateTime removeTime = UtilsCLI.parseDateTime(LocalDateTime.now(), params.getOrDefault("-t", null));
+            LocalDateTime removeTime = UtilsCommandLineInterface.parseDateTime(LocalDateTime.now(), params.getOrDefault("-t", null));
             shortLinkManager.changeLink(params.get("-s"), loggedUser, count, removeTime);
         } catch (Exception e) {
             System.out.println(e.getMessage());

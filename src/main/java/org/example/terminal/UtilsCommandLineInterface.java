@@ -7,7 +7,7 @@ import java.time.format.DateTimeParseException;
 /**
  * Класс для утилит CLI
  */
-public class UtilsCLI {
+public class UtilsCommandLineInterface {
 
     public static LocalDateTime parseDateTime(LocalDateTime time, String value) {
         if (value == null) return null;
@@ -20,10 +20,9 @@ public class UtilsCLI {
                 return null;
             }
         } else if (value.matches("^\\d+:\\d{2}:\\d{2}$")) {
-            time = LocalDateTime.now();
             String[] timeInput = value.split(":");
             if (Long.parseLong(timeInput[1]) > 60 || Long.parseLong(timeInput[2]) > 60) {
-
+                throw new IllegalArgumentException("Неверный формат даты. Используйте: дд.мм.гггг чч:мм:cc или чч:мм:cc");
             }
             time = time.plusHours(Long.parseLong(timeInput[0]));
             time = time.plusMinutes(Long.parseLong(timeInput[1]));
@@ -31,8 +30,7 @@ public class UtilsCLI {
             // Формат без даты: ЧЧЧЧ:ММ:СС"
             return time;
         } else {
-            System.out.println("Неверный формат даты. Используйте: дд.мм.гггг чч:мм:cc или чч:мм:cc");
-            return null;
+            throw new IllegalArgumentException("Неверный формат даты. Используйте: дд.мм.гггг чч:мм:cc или чч:мм:cc");
         }
     }
 
