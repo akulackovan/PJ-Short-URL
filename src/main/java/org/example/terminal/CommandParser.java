@@ -125,7 +125,7 @@ public class CommandParser {
 
     public String getUserUUID(String uuid) {
         if (uuid != null) return uuid;
-        System.out.println("Если Вы не имеете UUID пользователя пропустите следущий шаг.");
+        System.out.println("Если Вы не имеете UUID пользователя пропустите следующий шаг.");
         return getInput("UUID пользователя");
     }
 
