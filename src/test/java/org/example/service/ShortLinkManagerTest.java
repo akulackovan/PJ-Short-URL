@@ -52,6 +52,7 @@ public class ShortLinkManagerTest {
                 mockedDesktop = null;
             }
         }
+        cleanupTestFiles();
     }
 
     @BeforeEach
