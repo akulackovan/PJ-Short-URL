@@ -3,10 +3,12 @@ package org.example.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.example.exception.UserExceptions;
 import org.example.model.Notification;
+import org.example.storage.Config;
 import org.example.storage.JsonStorage;
 
 /**
@@ -31,6 +33,12 @@ public class UserService {
 
     public boolean userExists(UUID userId) {
         return users.containsKey(userId);
+    }
+
+    public void removeUser(UUID userId) {
+
+        users.remove(userId);
+        storage.saveUser(users);
     }
 
     public void addNotification(UUID userId, Notification notification) {
@@ -65,6 +73,14 @@ public class UserService {
 
     public List<Notification> getNotifications(UUID userId) {
         return users.getOrDefault(userId, new ArrayList<>());
+    }
+
+
+    public void updateListUsers(Set<UUID> uniqueUsers) {
+        if (!Boolean.parseBoolean(Config.get("users.save"))) {
+            users.entrySet().removeIf(entry -> !uniqueUsers.contains(entry.getKey()) && entry.getValue().isEmpty());
+            storage.saveUser(users);
+        }
     }
 
 }

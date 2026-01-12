@@ -26,6 +26,7 @@ public class CommandLineInterface {
     private final CommandRegistry commands;
     private final CommandParser commandParser;
     private ScheduledExecutorService scheduler;
+
     public CommandLineInterface() {
         this.scanner = new Scanner(System.in, "CP866");
         this.shortLinkManager = new ShortLinkManager(null);
@@ -51,17 +52,16 @@ public class CommandLineInterface {
 
         scheduler = Executors.newScheduledThreadPool(1);
 
-        
+
         int time = Integer.parseInt(Config.get("links.clear_time", "1"));
         if (time > 0) {
             scheduler.scheduleAtFixedRate(() -> {
                 shortLinkManager.clearLinks();
             }, 0, time, TimeUnit.SECONDS);
         }
-        
+
         while (true) {
             shortLinkManager.clearLinks();
-            isLogout();
             System.out.println("\nВведите операцию:");
             String[] args = scanner.nextLine().trim().split(" ");
             CommandsName commandEnum = CommandsName.fromString(args[0]);
@@ -92,7 +92,8 @@ public class CommandLineInterface {
     private boolean isLogout() {
         if (loggedUser != null) {
             shortLinkManager.getUserService().sendNotificationsToUser(loggedUser);
-            if (!shortLinkManager.getUserService().userExists(loggedUser) && shortLinkManager.getShortLinkService().getLinksForUser(loggedUser).isEmpty()) {
+            shortLinkManager.removeUser(loggedUser);
+            if (!shortLinkManager.getUserService().userExists(loggedUser)) {
                 System.out.println("Все короткие ссылки пользователя удалены");
                 System.out.println("Пользователь был удален!");
                 System.out.println("Выполните создание новой короткой ссылки для создания нового UUID");
@@ -156,6 +157,7 @@ public class CommandLineInterface {
             return;
         try {
             loggedUser = shortLinkManager.getUserService().validateUser(params.get("-u"));
+            isLogout();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.out.println("Вход не будет выполнен");
@@ -329,7 +331,7 @@ public class CommandLineInterface {
         }
     }
 
-    private void help(String[] args){
+    private void help(String[] args) {
         if (args.length > 2) {
             System.out.println("Неверный синтаксис команды");
         }

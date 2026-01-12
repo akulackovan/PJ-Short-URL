@@ -8,7 +8,7 @@ import org.example.model.ShortLink;
 import org.example.storage.Config;
 
 /**
- *  Сервис для обработки уведомлений
+ * Сервис для обработки уведомлений
  */
 public class NotificationService {
 
@@ -19,7 +19,7 @@ public class NotificationService {
     }
 
     public static void checkAndSendLinkNotifications(ShortLink link) {
-        if (link.getCountOfRequest() <= Integer.parseInt(Config.get("links.count_notification", "3"))) {
+        if (link.getCountOfRequest() > 0 && link.getCountOfRequest() <= Integer.parseInt(Config.get("links.count_notification", "3"))) {
             notify(NotificationType.LOW_LIMIT_WARNING, link.getShortLink());
         }
         if (Duration.between(LocalDateTime.now(), link.getRemoveTime()).toSeconds() <= Integer.parseInt(Config.get("links.time_notification", "3600"))) {

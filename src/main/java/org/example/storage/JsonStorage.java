@@ -52,32 +52,15 @@ public final class JsonStorage {
             return storageData;
         }
         try {
-            storageData = objectMapper.readValue(file, StorageData.class);
-            clearUsers(storageData.getUsers());
-            return storageData;
+            return objectMapper.readValue(file, StorageData.class);
         } catch (IOException e) {
             System.err.println("Ошибка чтения файла пользователей: " + e.getMessage());
             return storageData;
         }
     }
 
-    public Map<UUID, List<Notification>> clearUsers(Map<UUID, List<Notification>> users) {
-        Set<UUID> uniqueUsers = storageData.getLinks().stream()
-                .map(ShortLink::getUuid)
-                .collect(Collectors.toSet());
-        if (!Boolean.parseBoolean(Config.get("users.save"))) {
-            users.entrySet().removeIf(entry -> !uniqueUsers.contains(entry.getKey()) && entry.getValue().isEmpty());
-        }
-        for (UUID user : uniqueUsers) {
-            if (!users.containsKey(user)) {
-                users.put(user, new ArrayList<>());
-            }
-        }
-        saveUser(users);
-        return users;
-    }
 
-    public void saveStorage(StorageData storageData){
+    public void saveStorage(StorageData storageData) {
         try {
             this.storageData = storageData;
             objectMapper.writeValue(file, this.storageData);

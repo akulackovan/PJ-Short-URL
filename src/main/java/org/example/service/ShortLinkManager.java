@@ -64,6 +64,12 @@ public class ShortLinkManager {
         }
     }
 
+    public void removeUser(UUID user) {
+        if (!Boolean.parseBoolean(Config.get("users.save")) && userService.getNotifications(user).isEmpty() && shortLinkService.getLinksForUser(user).isEmpty()) {
+            userService.removeUser(user);
+        }
+    }
+
     public void useLink(String link, UUID user)
             throws LinkExceptions.EmptyShortCodeException,
             LinkExceptions.ShortLinkNotFoundException, URISyntaxException, IOException {

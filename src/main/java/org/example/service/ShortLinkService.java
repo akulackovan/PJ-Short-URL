@@ -101,5 +101,10 @@ public class ShortLinkService {
         return expiredLinks;
     }
 
+    public Set<UUID> getUniqueUsers() {
+        return links.stream()
+                .map(ShortLink::getUuid)
+                .collect(Collectors.toSet());
+    }
 
 }
