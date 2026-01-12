@@ -30,6 +30,7 @@ public final class JsonStorage {
 
     private File file = null;
     private StorageData storageData;
+    public final Object LOCK = new Object();
 
     public JsonStorage(String filename) {
         objectMapper.registerModule(new JavaTimeModule());
@@ -38,9 +39,7 @@ public final class JsonStorage {
         this.file = new File(FILE_PATH);
         objectMapper.findAndRegisterModules();
         storageData = new StorageData();
-    }
 
-    public StorageData loadData() {
         if (!file.exists() || file.length() == 0) {
             try {
                 file.getParentFile().mkdirs();
@@ -49,14 +48,16 @@ public final class JsonStorage {
             } catch (IOException e) {
                 System.err.println("Ошибка при создании файла: " + e.getMessage());
             }
-            return storageData;
         }
         try {
-            return objectMapper.readValue(file, StorageData.class);
+            storageData = objectMapper.readValue(file, StorageData.class);
         } catch (IOException e) {
             System.err.println("Ошибка чтения файла пользователей: " + e.getMessage());
-            return storageData;
         }
+    }
+
+    public StorageData loadData() {
+        return storageData;
     }
 
 

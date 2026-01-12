@@ -25,61 +25,66 @@ public class UserService {
     }
 
     public UUID createAnonymousUser() {
-        UUID userId = UUID.randomUUID();
-        users.put(userId, new ArrayList<>());
-        storage.saveUser(users);
-        return userId;
+        synchronized (storage.LOCK) {
+            UUID userId = UUID.randomUUID();
+            users.put(userId, new ArrayList<>());
+            storage.saveUser(users);
+            return userId;
+        }
     }
 
     public boolean userExists(UUID userId) {
-        return users.containsKey(userId);
+        synchronized (storage.LOCK) {
+            return users.containsKey(userId);
+        }
     }
 
     public void removeUser(UUID userId) {
-
-        users.remove(userId);
-        storage.saveUser(users);
+        synchronized (storage.LOCK) {
+            users.remove(userId);
+            storage.saveUser(users);
+        }
     }
 
     public void addNotification(UUID userId, Notification notification) {
-        users.computeIfAbsent(userId, k -> new ArrayList<>()).add(notification);
-        storage.saveUser(users);
+        synchronized (storage.LOCK) {
+            users.computeIfAbsent(userId, k -> new ArrayList<>()).add(notification);
+            storage.saveUser(users);
+        }
     }
 
     public UUID validateUser(String userUUID) throws UserExceptions.InvalidUuidException, UserExceptions.UserNotFoundException {
-        if (userUUID == null) {
-            return null;
+        synchronized (storage.LOCK) {
+            if (userUUID == null) {
+                return null;
+            }
+            UUID uuid;
+            try {
+                uuid = UUID.fromString(userUUID);
+            } catch (IllegalArgumentException e) {
+                throw new UserExceptions.InvalidUuidException();
+            }
+            if (!users.containsKey(uuid)) {
+                throw new UserExceptions.UserNotFoundException(userUUID);
+            }
+            return uuid;
         }
-        UUID uuid;
-        try {
-            uuid = UUID.fromString(userUUID);
-        } catch (IllegalArgumentException e) {
-            throw new UserExceptions.InvalidUuidException();
-        }
-        if (!users.containsKey(uuid)) {
-            throw new UserExceptions.UserNotFoundException(userUUID);
-        }
-        return uuid;
     }
 
     public void sendNotificationsToUser(UUID userId) {
-        List<Notification> userNotifications = users.getOrDefault(userId, new ArrayList<>());
-        for (Notification notification : userNotifications) {
-            NotificationService.notify(notification.getNotificationType(), notification.getLink());
+        synchronized (storage.LOCK) {
+            List<Notification> userNotifications = users.getOrDefault(userId, new ArrayList<>());
+            for (Notification notification : userNotifications) {
+                NotificationService.notify(notification.getNotificationType(), notification.getLink());
+            }
+            users.put(userId, new ArrayList<>());
+            storage.saveUser(users);
         }
-        users.put(userId, new ArrayList<>());
-        storage.saveUser(users);
     }
 
     public List<Notification> getNotifications(UUID userId) {
-        return users.getOrDefault(userId, new ArrayList<>());
-    }
-
-
-    public void updateListUsers(Set<UUID> uniqueUsers) {
-        if (!Boolean.parseBoolean(Config.get("users.save"))) {
-            users.entrySet().removeIf(entry -> !uniqueUsers.contains(entry.getKey()) && entry.getValue().isEmpty());
-            storage.saveUser(users);
+        synchronized (storage.LOCK) {
+            return users.getOrDefault(userId, new ArrayList<>());
         }
     }
 

@@ -74,9 +74,6 @@ public class ShortLinkManager {
             throws LinkExceptions.EmptyShortCodeException,
             LinkExceptions.ShortLinkNotFoundException, URISyntaxException, IOException {
         ShortLink shortLink = validateShortLink(link);
-        if (shortLink == null) {
-            throw new LinkExceptions.ShortLinkNotFoundException();
-        }
         if (shortLink.isExpired()) {
             userService.addNotification(shortLink.getUuid(), new Notification(shortLink.getShortLink(), NotificationType.LINK_EXPIRED));
             userService.addNotification(shortLink.getUuid(), new Notification(shortLink.getShortLink(), NotificationType.LINK_DELETED));
@@ -86,7 +83,7 @@ public class ShortLinkManager {
         shortLinkService.useLink(shortLink);
         Desktop.getDesktop().browse(new URI(shortLink.getRealURL()));
         NotificationService.checkAndSendLinkNotifications(shortLink);
-        if (shortLink.getCountOfRequest() == 0 && user != shortLink.getUuid()) {
+        if (shortLink.getCountOfRequest() == 0 && !shortLink.getUuid().equals(user)) {
             userService.addNotification(shortLink.getUuid(), new Notification(shortLink.getShortLink(),
                     NotificationType.LIMIT_EXCEEDED));
             userService.addNotification(shortLink.getUuid(), new Notification(shortLink.getShortLink(), NotificationType.LINK_DELETED));
@@ -101,9 +98,6 @@ public class ShortLinkManager {
             throws LinkExceptions.EmptyShortCodeException,
             LinkExceptions.ShortLinkNotFoundException, LinkExceptions.UnauthorizedAccessException {
         ShortLink shortLink = validateShortLink(link);
-        if (shortLink == null) {
-            throw new LinkExceptions.ShortLinkNotFoundException();
-        }
         if (!user.equals(shortLink.getUuid())) {
             throw new LinkExceptions.UnauthorizedAccessException();
         }
@@ -116,9 +110,6 @@ public class ShortLinkManager {
             LinkExceptions.ShortLinkNotFoundException, LinkExceptions.UnauthorizedAccessException,
             LinkExceptions.InvalidExpirationTimeException {
         ShortLink shortLink = validateShortLink(link);
-        if (shortLink == null) {
-            throw new LinkExceptions.ShortLinkNotFoundException();
-        }
         if (!user.equals(shortLink.getUuid())) {
             throw new LinkExceptions.UnauthorizedAccessException();
         }
@@ -127,7 +118,7 @@ public class ShortLinkManager {
     }
 
     public ShortLink validateShortLink(String shortLink)
-            throws LinkExceptions.EmptyShortCodeException {
+            throws LinkExceptions.EmptyShortCodeException, LinkExceptions.ShortLinkNotFoundException {
         if (shortLink == null || shortLink.isEmpty()) {
             throw new LinkExceptions.EmptyShortCodeException();
         }

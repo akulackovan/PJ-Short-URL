@@ -157,6 +157,7 @@ public class CommandLineInterface {
             return;
         try {
             loggedUser = shortLinkManager.getUserService().validateUser(params.get("-u"));
+            if (loggedUser != null) System.out.println("Успешный вход");
             isLogout();
         } catch (Exception e) {
             System.out.println(e.getMessage());

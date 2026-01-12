@@ -1,5 +1,6 @@
 package org.example.service;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import org.example.model.ShortLink;
 import org.example.model.StorageData;
 import org.example.storage.Config;
 import org.example.storage.JsonStorage;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,9 +45,13 @@ public class ShortLinkServiceTest {
     private final String prefixLinks2 = "click.ru/";
     private final UUID firstUser = UUID.randomUUID();
     private final UUID secondUser = UUID.randomUUID();
+    private static final String TEST_FILE = "data/test.json";
 
     @BeforeEach
     void setUp() {
+
+        cleanupTestFiles();
+        storage = new JsonStorage(TEST_FILE);
         testLinks = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime removeTime = now.plusMinutes(10);
@@ -71,18 +77,24 @@ public class ShortLinkServiceTest {
 
         mockedConfig.when(() -> Config.get("links.check_by_code", "true"))
                 .thenReturn("true");
+        storage.saveLinks(testLinks);
+        storage.saveUser(new HashMap<>());
 
-        storage = mock(JsonStorage.class);
-        StorageData storageData = mock(StorageData.class);
-        when(storageData.getLinks()).thenReturn(testLinks);
-        when(storageData.getUsers()).thenReturn(new HashMap<>());
-        when(storage.loadData()).thenReturn(storageData);
     }
 
     @AfterEach
     void tearDown() {
         if (mockedConfig != null) {
             mockedConfig.close();
+        }
+        cleanupTestFiles();
+    }
+
+
+    private void cleanupTestFiles() {
+        File file = new File(TEST_FILE);
+        if (file.exists()) {
+            file.delete();
         }
     }
 
